@@ -1,4 +1,4 @@
-main.bin:main.asm ./inc/load.asm ./inc/printh.asm ./inc/printl.asm ./inc/strings.asm
+main.bin:main.asm ./inc/load.asm ./inc/printh.asm ./inc/printl.asm ./inc/strings.asm ./inc/testA20.asm
 	nasm main.asm -f bin -o boot.bin
 
 clean:

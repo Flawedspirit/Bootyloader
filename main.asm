@@ -1,8 +1,8 @@
 org 0x7c00                  ;Memory address all bootloaders need to start at
 bits 16                     ;We in 16-bit real mode, son!
 
+global start
 section .text
-    global start
 
 start:
     cli                     ;Prevent interrupts while we initialize
@@ -27,17 +27,33 @@ init:
     mov si, STR_0
     call print_l
 
+    ;mov ax, 0x2400          ;Disable A20 line on purpose
+    ;int 0x15
+
+    call testA20
+    cmp ax, 0               ;0 is disabled, 1 is enabled
+    jne .A10
+    jmp short .end_A10
+
+.A10:
+    mov si, STR_1
+    call print_l
+.end_A10:
+
+    jmp $                   ;Safety hang for debugging
+    
     mov dl, 0x80
     mov al, 1               ;Read only one sector
     mov cl, 2               ;Start at second sector - first is this bootloader
     call load
-
+    
     jmp $                   ;Halt system if nothing happens
 
 %include './inc/strings.asm'
 %include './inc/load.asm'
 %include './inc/printh.asm'
 %include './inc/printl.asm'
+%include './inc/testA20.asm'
 
 times 510-($-$$) db 0       ;Padding to make the file EXACTLY 512 bytes
 dw 0xaa55                   ;Magic number - the reason for the season
